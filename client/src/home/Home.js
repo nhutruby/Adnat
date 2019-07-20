@@ -5,6 +5,7 @@ import Paper from '@material-ui/core/Paper'
 import sagaMiddleware from '../common/saga'
 import SignOutSaga from '../signout/SignOutSaga'
 import SignOutReducer from '../signout/SignOutReducer'
+import Organisations from '../organisation/List'
 const Grid = lazy(() => import('@material-ui/core/Grid'))
 const Header = lazy(() => import('../header/Header'))
 const styles = theme => ({
@@ -31,6 +32,11 @@ class CHome extends React.Component {
           <Grid item={true} xs={12}>
             <Paper className={classes.paper} elevation={1}>
               <Header />
+            </Paper>
+          </Grid>
+          <Grid item={true} xs={12}>
+            <Paper className={classes.paper} elevation={1}>
+              <Organisations />
             </Paper>
           </Grid>
         </Grid>

@@ -5,14 +5,18 @@ import getCookie from '../common/cookie'
 import sagaMiddleware from '../common/saga'
 import AuthSaga from '../auth/AuthSaga'
 import {auth} from '../auth/AuthAction'
+import HomeSaga from '../home/HomeSaga'
+import {home} from '../home/HomeAction'
 const Home = lazy(() => import('../home/Home'))
 const Welcome = lazy(() => import('../welcome/Welcome'))
 class CApp extends React.Component {
   componentWillMount() {
     sagaMiddleware.run(AuthSaga, this.props.store)
+    sagaMiddleware.run(HomeSaga, this.props.store)
     const authToken = getCookie('auth_token')
     if (authToken !== '') {
       this.props.auth(authToken)
+      this.props.home(authToken)
     }
   }
   render() {
@@ -39,6 +43,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     auth: auth_token => dispatch(auth(auth_token)),
+    home: auth_token => dispatch(home(auth_token)),
   }
 }
 

@@ -33,8 +33,6 @@ module Adnat
     config.api_only = true
     config.generators do |g|
       g.orm :mongoid
-      g.test_framework :rspec, fixture: true
-      g.fixture_replacement :factory_bot, dir: 'spec/factories'
       g.view_specs false
       g.helper_specs false
       g.stylesheets = false

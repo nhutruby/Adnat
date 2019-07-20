@@ -47,6 +47,10 @@ class User
                        on: :create
   validates :name, presence: true
 
+  ## Association
+  belongs_to :organisation, optional: true
+  has_many :shifts, dependent: :destroy
+
   ## Index
   index({ auth_token: 1 }, unique: true)
 
@@ -56,6 +60,18 @@ class User
     loop do
       self.auth_token = Devise.friendly_token
       break unless User.find_by(auth_token: auth_token)
+    end
+  end
+
+  def self.home(organisation, params)
+    if organisation.present?
+      shifts = Shift.where(organisation_id: organisation.id)
+                    .order_by(id: :desc).page(params[:page]).per(params[:per_page])
+      { organisation: organisation, shifts: shifts }
+    else
+      organisations = Organisation.order_by(id: :desc).page(params[:page]).per(params[:per_page])
+      organisations.to_json(only: %I[_id name hourly_rate])
+      { organisations: organisations }
     end
   end
 end
