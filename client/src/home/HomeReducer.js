@@ -13,12 +13,22 @@ const HomeReducer = (state, action) => {
         error: action.message
       }
     case "HOME_SUCCESS":
-      return {
-        ...state,
-        organisations: _.uniqBy(
-          state.organisations.concat(action.data.organisations),
-          "id"
-        )
+      if (action.data.organisations) {
+        return {
+          ...state,
+          organisations: _.uniqBy(
+            state.organisations.concat(action.data.organisations),
+            "id"
+          ),
+          user_organisation: action.data.organisation,
+          shifts: action.data.shifts
+        }
+      } else {
+        return {
+          ...state,
+          user_organisation: action.data.organisation,
+          shifts: action.data.shifts
+        }
       }
     case "DELETE_ORGANISATION":
       return { ...state, delete_organisation_id: action.payload.id }
@@ -67,11 +77,8 @@ const HomeReducer = (state, action) => {
     case "JOIN_ORGANISATION":
       return { ...state, error: null }
     case "JOIN_ORGANISATION_FAIL":
-      console.log("1")
       return { ...state, error: action.error.response }
     case "JOIN_ORGANISATION_SUCCESS":
-      console.log("2")
-      console.log(action.data)
       return {
         ...state,
         user_organisation: action.data.organisation,

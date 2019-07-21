@@ -122,7 +122,6 @@ function FList(props) {
     event.stopPropagation()
     const authToken = getCookie("auth_token")
     if (authToken !== "") {
-      console.log(authToken)
       props.joinOrganisation({
         auth_token: authToken,
         id: id
@@ -241,6 +240,11 @@ function FList(props) {
 FList.propTypes = {
   classes: PropTypes.object.isRequired
 }
+const mapStateToProps = state => {
+  return {
+    organisations: state.HomeReducer.organisations
+  }
+}
 const mapDispatchToProps = dispatch => {
   return {
     deleteOrganisation: params => dispatch(deleteOrganisation(params)),
@@ -250,7 +254,7 @@ const mapDispatchToProps = dispatch => {
   }
 }
 const List = connect(
-  null,
+  mapStateToProps,
   mapDispatchToProps
 )(FList)
 

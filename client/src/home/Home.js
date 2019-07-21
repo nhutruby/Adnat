@@ -61,10 +61,10 @@ class CHome extends React.Component {
     window.removeEventListener("scroll", this.handleScroll)
   }
   render() {
-    const { classes, organisations, user_organisation } = this.props
+    const { classes, user_organisation } = this.props
     return (
       <div className={classes.root}>
-        {user_organisation ? (
+        {user_organisation != null ? (
           <Grid container={true} spacing={3}>
             <Grid item={true} xs={12}>
               <Paper className={classes.paper} elevation={1}>
@@ -93,7 +93,7 @@ class CHome extends React.Component {
             </Grid>
             <Grid item={true} xs={8}>
               <Paper className={classes.paper} elevation={1}>
-                <Organisations organisations={organisations} />
+                <Organisations />
               </Paper>
             </Grid>
             <Grid item={true} xs={2}>
