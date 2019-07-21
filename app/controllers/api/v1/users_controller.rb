@@ -5,7 +5,7 @@ module Api
     # Users controller
     class UsersController < ApplicationController
       respond_to :json
-      before_action :authenticate_with_token!, only: %I[update destroy]
+      before_action :authenticate_with_token!, only: %I[update destroy join]
       def show
         respond_with User.find(params[:id])
       end
@@ -43,6 +43,16 @@ module Api
       def destroy
         current_user.destroy
         head 204
+      end
+
+      # JOIN
+      def join
+        if current_user.update(organisation_id: params[:organisation_id])
+          data = User.home(current_user.organisation, page_params)
+          render json: data, status: :created, location: [:api, current_user]
+        else
+          render json: current_user.errors.full_messages, status: :unprocessable_entity
+        end
       end
 
       private

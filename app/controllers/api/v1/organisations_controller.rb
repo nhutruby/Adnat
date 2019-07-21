@@ -13,7 +13,7 @@ module Api
 
         if @organisation.save
           data = User.home(current_user.organisation, page_params)
-          render json: data, status: :created, location:  [:api, @organisation]
+          render json: data, status: :created, location: [:api, @organisation]
         else
           render json: @organisation.errors.full_messages, status: :unprocessable_entity
         end
@@ -22,9 +22,9 @@ module Api
       # PATCH/PUT /organisations/1
       def update
         if @organisation.update(organisation_params)
-          render json: @organisation
+          render json: @organisation.to_json(only: %I[_id name hourly_rate])
         else
-          render json: @organisation.errors, status: :unprocessable_entity
+          render json: @organisation.errors.full_messages, status: :unprocessable_entity
         end
       end
 

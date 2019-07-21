@@ -7,15 +7,19 @@ import { withStyles } from "@material-ui/core/styles"
 import TextField from "@material-ui/core/TextField"
 import Typography from "@material-ui/core/Typography"
 import { connect } from "react-redux"
-import { edit } from "../home/HomeAction"
+import { editOrganisation } from "../home/HomeAction"
+import getCookie from "../common/cookie"
 const styles = theme => ({
   textField: {
-    marginLeft: theme.spacing.unit,
-    marginRight: theme.spacing.unit,
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
     width: "100%"
   },
   container: {
     display: "flex"
+  },
+  button: {
+    textTransform: "none"
   },
   error: {
     textAlign: "center",
@@ -28,7 +32,9 @@ class CEdit extends React.Component {
     super(props)
     this.state = {
       name: this.props.name,
-      nameError: null
+      nameError: null,
+      hourly_rate: this.props.hourlyRate,
+      hourlyRateError: null
     }
     this.handleValidate = this.handleValidate.bind(this)
     this.handleChange = this.handleChange.bind(this)
@@ -39,15 +45,13 @@ class CEdit extends React.Component {
   }
 
   handleChange = e => {
-    this.setState({
-      [e.target.id]: e.target.value
-    })
+    this.setState({ [e.target.id]: e.target.value })
     this.handleValidate()
   }
   handleValidate = () => {
     const formEl = this.formEl
     const formLength = formEl.length
-    this.setState({ nameError: null })
+    this.setState({ nameError: null, hourlyRateError: null })
     if (formEl.checkValidity() === false) {
       for (let i = 0; i < formLength; i++) {
         const elem = formEl[i]
@@ -55,7 +59,12 @@ class CEdit extends React.Component {
           if (!elem.validity.valid) {
             switch (elem.name) {
               case "name":
-                this.setState({ nameError: elem.validationMessage })
+                this.setState({ nameError: "Name: " + elem.validationMessage })
+                break
+              case "hourly_rate":
+                this.setState({
+                  hourlyRateError: "Hourly Rate: " + elem.validationMessage
+                })
                 break
               default:
             }
@@ -70,8 +79,20 @@ class CEdit extends React.Component {
   handleSubmit = event => {
     event.preventDefault()
     if (this.handleValidate()) {
-      if (this.state.name.trim() !== this.props.name.trim()) {
-        this.props.edit({ id: this.props.id, name: this.state.name })
+      if (
+        this.state.name.trim() !== this.props.name.trim() ||
+        this.state.hourly_rate !== this.props.hourlyRate
+      ) {
+        const authToken = getCookie("auth_token")
+        if (authToken !== "") {
+          this.props.editOrganisation({
+            id: this.props.id,
+            name: this.state.name,
+            hourly_rate: this.state.hourly_rate,
+            per_page: this.props.rowsPerPage,
+            auth_token: authToken
+          })
+        }
       } else {
         this.props.handlerFromFormDialog(false)
       }
@@ -88,16 +109,21 @@ class CEdit extends React.Component {
 
     return (
       <div>
-        <DialogTitle id="form-dialog-title">Group</DialogTitle>
+        <DialogTitle id="form-dialog-title">Edit Organisation</DialogTitle>
 
         <form
           ref={form => (this.formEl = form)}
           onSubmit={this.handleSubmit}
-          noValidate="noValidate"
+          noValidate
         >
           {this.state.nameError && (
             <div className={classes.error}>
-              <label>{this.state.nameError}</label>
+              <label> {this.state.nameError}</label>
+            </div>
+          )}
+          {this.state.hourlyRateError && (
+            <div className={classes.error}>
+              <label> {this.state.hourlyRateError}</label>
             </div>
           )}
           {this.props.error && (
@@ -116,9 +142,28 @@ class CEdit extends React.Component {
             variant="outlined"
             required={true}
           />
+          <TextField
+            id="hourly_rate"
+            name="hourly_rate"
+            label="Hourly Rate ($)"
+            value={this.state.hourly_rate}
+            onChange={this.handleChange}
+            type="number"
+            className={classes.textField}
+            margin="normal"
+            variant="outlined"
+            inputProps={{
+              min: 0
+            }}
+            required={true}
+          />
           <Typography component="pre">
             <DialogActions>
-              <Button onClick={this.handleClose} color="primary">
+              <Button
+                onClick={this.handleClose}
+                color="primary"
+                className={classes.button}
+              >
                 Cancel
               </Button>
               <Button
@@ -126,6 +171,7 @@ class CEdit extends React.Component {
                 variant="contained"
                 type="submit"
                 name="submit"
+                className={classes.button}
               >
                 Edit
               </Button>
@@ -141,11 +187,13 @@ CEdit.propTypes = {
 }
 const mapDispatchToProps = dispatch => {
   return {
-    edit: params => dispatch(edit(params))
+    editOrganisation: params => dispatch(editOrganisation(params))
   }
 }
 const mapStateToProps = state => {
-  return { error: state.AppReducer.error }
+  return {
+    error: state.HomeReducer.error
+  }
 }
 const Edit = connect(
   mapStateToProps,

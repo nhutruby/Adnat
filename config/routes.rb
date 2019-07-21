@@ -8,6 +8,7 @@ Rails.application.routes.draw do
           constraints: Versions.new(version: 1, default: true) do
       resources :users, only: %i[show create update destroy me] do
         post 'me', on: :collection
+        put 'join', on: :collection
       end
       resources :sessions, only: %i[create destroy]
       resources :home, only: %i[index]

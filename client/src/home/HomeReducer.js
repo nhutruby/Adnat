@@ -49,6 +49,21 @@ const HomeReducer = (state, action) => {
         organisations: action.data.organisations,
         error: false
       }
+    case "EDIT_ORGANISATION_SHOW":
+      return { ...state, error: null }
+    case "EDIT_ORGANISATION":
+      return state
+    case "EDIT_ORGANISATION_FAIL":
+      return { ...state, error: action.error.response.data }
+    case "EDIT_ORGANISATION_SUCCESS":
+      state.organisations &&
+        state.organisations.forEach(function(i) {
+          if (i.id === action.data.id) {
+            i.name = action.data.name
+            i.hourly_rate = action.data.hourly_rate
+          }
+        })
+      return { ...state, error: false }
     default:
       return state
   }

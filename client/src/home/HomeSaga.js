@@ -1,8 +1,10 @@
 import { call, put, take, fork } from "redux-saga/effects"
 import axios from "axios"
-
+function setHeader(authToken) {
+  axios.defaults.headers.common["Authorization"] = authToken
+}
 function home(params) {
-  axios.defaults.headers.common["Authorization"] = params.auth_token
+  setHeader(params.auth_token)
   return axios.get("/home", {
     params: { page: params.page, per_page: params.per_page }
   })
@@ -22,7 +24,7 @@ function* workerHome() {
   }
 }
 function deleteOrganisation(params) {
-  axios.defaults.headers.common["Authorization"] = params.auth_token
+  setHeader(params.auth_token)
   return axios.delete("/organisations/" + params.id)
 }
 
@@ -40,7 +42,7 @@ function* workerDeleteOrganisation() {
   }
 }
 function newOrganisation(params) {
-  axios.defaults.headers.common["Authorization"] = params.auth_token
+  setHeader(params.auth_token)
   return axios.post("/organisations", {
     name: params.name,
     hourly_rate: params.hourly_rate,
@@ -61,8 +63,28 @@ function* workerNewOrganisation() {
     }
   }
 }
+function editOrganisation(params) {
+  setHeader(params.auth_token)
+  delete params.auth_token
+  return axios.put("/organisations/" + params.id, params)
+}
+
+function* workerEditOrganisation() {
+  while (true) {
+    try {
+      const request = yield take("EDIT_ORGANISATION")
+      const params = request.payload
+      const response = yield call(editOrganisation, params)
+      const data = response.data
+      yield put({ type: "EDIT_ORGANISATION_SUCCESS", data })
+    } catch (error) {
+      yield put({ type: "EDIT_ORGANISATION_FAIL", error })
+    }
+  }
+}
 export default function* watcherSearch() {
   yield fork(workerHome)
   yield fork(workerDeleteOrganisation)
   yield fork(workerNewOrganisation)
+  yield fork(workerEditOrganisation)
 }

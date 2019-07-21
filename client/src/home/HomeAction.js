@@ -28,3 +28,15 @@ export const newOrganisationSuccess = () => {
 export const newOrganisationFail = error => {
   return { type: "NEW_ORGANISATION_FAIL", error: error }
 }
+export const editOrganisationShow = error => {
+  return { type: "EDIT_ORGANISATION_SHOW" }
+}
+export const editOrganisation = params => {
+  return { type: "EDIT_ORGANISATION", payload: params }
+}
+export const editOrganisationSuccess = () => {
+  return { type: "EDIT_ORGANISATION_SUCCESS" }
+}
+export const editOrganisationFail = error => {
+  return { type: "EDIT_ORGANISATION_FAIL", error: error }
+}

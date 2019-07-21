@@ -13,12 +13,17 @@ import Tooltip from "@material-ui/core/Tooltip"
 import DeleteIcon from "@material-ui/icons/Delete"
 import EditIcon from "@material-ui/icons/Edit"
 import PersonAddIcon from "@material-ui/icons/PersonAdd"
-import { deleteOrganisation, newOrganisationShow } from "../home/HomeAction"
+import {
+  deleteOrganisation,
+  newOrganisationShow,
+  editOrganisationShow
+} from "../home/HomeAction"
 import { connect } from "react-redux"
 import getCookie from "../common/cookie"
 import Dialog from "@material-ui/core/Dialog"
 import DialogContent from "@material-ui/core/DialogContent"
 const New = lazy(() => import("./New"))
+const Edit = lazy(() => import("./Edit"))
 const styles = theme => ({
   root: {
     width: "100%",
@@ -47,7 +52,14 @@ class FormDialog extends React.Component {
   }
 
   render() {
-    const { dialogShow, maxWidth, rowsPerPage } = this.props
+    const {
+      organisationId,
+      name,
+      hourlyRate,
+      dialogShow,
+      maxWidth,
+      rowsPerPage
+    } = this.props
     let form
     switch (dialogShow) {
       case "new":
@@ -55,6 +67,16 @@ class FormDialog extends React.Component {
           <New
             handlerFromFormDialog={this.handleData}
             rowsPerPage={rowsPerPage}
+          />
+        )
+        break
+      case "edit":
+        form = (
+          <Edit
+            handlerFromFormDialog={this.handleData}
+            id={organisationId}
+            name={name}
+            hourlyRate={hourlyRate}
           />
         )
         break
@@ -81,6 +103,9 @@ function FList(props) {
   const [open, setOpen] = React.useState(false)
   const [dialogShow, setDialogShow] = React.useState()
   const [maxWidth, setMaxWidth] = React.useState()
+  const [name, setName] = React.useState()
+  const [hourlyRate, setHourlyRate] = React.useState()
+  const [organisationId, setOrganisationId] = React.useState()
   const [rowsPerPage] = React.useState(20)
   const handleDeleteClick = (event, id) => {
     event.stopPropagation()
@@ -101,6 +126,22 @@ function FList(props) {
     setDialogShow("new")
     setMaxWidth(maxWidth)
     props.newOrganisationShow()
+  }
+  const handleEditOrganisation = (
+    event,
+    organisationId,
+    name,
+    hourlyRate,
+    maxWidth
+  ) => {
+    event.stopPropagation()
+    setOpen(true)
+    setDialogShow("edit")
+    setOrganisationId(organisationId)
+    setName(name)
+    setHourlyRate(hourlyRate)
+    setMaxWidth(maxWidth)
+    props.editOrganisationShow()
   }
   return (
     <div>
@@ -140,7 +181,18 @@ function FList(props) {
                   <TableCell align="right">{row.hourly_rate}</TableCell>
                   <TableCell align="right">
                     <Tooltip title="Edit">
-                      <EditIcon className={classes.icon} />
+                      <EditIcon
+                        className={classes.icon}
+                        onClick={event =>
+                          handleEditOrganisation(
+                            event,
+                            row.id,
+                            row.name,
+                            row.hourly_rate,
+                            "sm"
+                          )
+                        }
+                      />
                     </Tooltip>
                     <Tooltip title="Delete">
                       <DeleteIcon
@@ -163,6 +215,9 @@ function FList(props) {
         dialogShow={dialogShow}
         maxWidth={maxWidth}
         rowsPerPage={rowsPerPage}
+        name={name}
+        hourlyRate={hourlyRate}
+        organisationId={organisationId}
       />
     </div>
   )
@@ -174,7 +229,8 @@ FList.propTypes = {
 const mapDispatchToProps = dispatch => {
   return {
     deleteOrganisation: params => dispatch(deleteOrganisation(params)),
-    newOrganisationShow: () => dispatch(newOrganisationShow())
+    newOrganisationShow: () => dispatch(newOrganisationShow()),
+    editOrganisationShow: () => dispatch(editOrganisationShow())
   }
 }
 const List = connect(

@@ -51,7 +51,7 @@ class CNew extends React.Component {
   handleValidate = () => {
     const formEl = this.formEl
     const formLength = formEl.length
-    this.setState({ nameError: null })
+    this.setState({ nameError: null, hourlyRateError: null })
     if (formEl.checkValidity() === false) {
       for (let i = 0; i < formLength; i++) {
         const elem = formEl[i]
@@ -59,10 +59,12 @@ class CNew extends React.Component {
           if (!elem.validity.valid) {
             switch (elem.name) {
               case "name":
-                this.setState({ nameError: elem.validationMessage })
+                this.setState({ nameError: "Name: " + elem.validationMessage })
                 break
               case "hourly_rate":
-                this.setState({ hourlyRateError: elem.validationMessage })
+                this.setState({
+                  hourlyRateError: "Hourly Rate: " + elem.validationMessage
+                })
                 break
               default:
             }
