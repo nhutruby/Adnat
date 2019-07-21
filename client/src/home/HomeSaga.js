@@ -33,6 +33,8 @@ function* workerDeleteOrganisation() {
     try {
       const request = yield take("DELETE_ORGANISATION")
       const params = request.payload
+      console.log(params)
+      console.log("delete")
       const response = yield call(deleteOrganisation, params)
       const status = response.status
       yield put({ type: "DELETE_ORGANISATION_SUCCESS", status })
@@ -82,9 +84,31 @@ function* workerEditOrganisation() {
     }
   }
 }
+function joinOrganisation(params) {
+  setHeader(params.auth_token)
+  delete params.auth_token
+  return axios.put("/users/join", params)
+}
+
+function* workerJoinOrganisation() {
+  while (true) {
+    try {
+      const request = yield take("JOIN_ORGANISATION")
+      const params = request.payload
+      console.log("aaaa223223")
+      console.log(params)
+      const response = yield call(joinOrganisation, params)
+      const data = response.data
+      yield put({ type: "JOIN_ORGANISATION_SUCCESS", data })
+    } catch (error) {
+      yield put({ type: "JOIN_ORGANISATION_FAIL", error })
+    }
+  }
+}
 export default function* watcherSearch() {
   yield fork(workerHome)
   yield fork(workerDeleteOrganisation)
   yield fork(workerNewOrganisation)
   yield fork(workerEditOrganisation)
+  yield fork(workerJoinOrganisation)
 }

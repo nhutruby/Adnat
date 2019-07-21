@@ -40,3 +40,12 @@ export const editOrganisationSuccess = () => {
 export const editOrganisationFail = error => {
   return { type: "EDIT_ORGANISATION_FAIL", error: error }
 }
+export const joinOrganisation = params => {
+  return { type: "JOIN_ORGANISATION", payload: params }
+}
+export const joinOrganisationSuccess = () => {
+  return { type: "JOIN_ORGANISATION_SUCCESS" }
+}
+export const joinOrganisationFail = error => {
+  return { type: "JOIN_ORGANISATION_FAIL", error: error }
+}

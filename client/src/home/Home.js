@@ -61,27 +61,46 @@ class CHome extends React.Component {
     window.removeEventListener("scroll", this.handleScroll)
   }
   render() {
-    const { classes } = this.props
+    const { classes, organisations, user_organisation } = this.props
     return (
       <div className={classes.root}>
-        <Grid container={true} spacing={3}>
-          <Grid item={true} xs={12}>
-            <Paper className={classes.paper} elevation={1}>
-              <Header />
-            </Paper>
+        {user_organisation ? (
+          <Grid container={true} spacing={3}>
+            <Grid item={true} xs={12}>
+              <Paper className={classes.paper} elevation={1}>
+                <Header />
+              </Paper>
+            </Grid>
+            <Grid item={true} xs={1}>
+              <Paper className={classes.paper} elevation={0} />
+            </Grid>
+            <Grid item={true} xs={10}>
+              <Paper className={classes.paper} elevation={1} />
+            </Grid>
+            <Grid item={true} xs={1}>
+              <Paper className={classes.paper} elevation={0} />
+            </Grid>
           </Grid>
-          <Grid item={true} xs={2}>
-            <Paper className={classes.paper} elevation={0} />
+        ) : (
+          <Grid container={true} spacing={3}>
+            <Grid item={true} xs={12}>
+              <Paper className={classes.paper} elevation={1}>
+                <Header />
+              </Paper>
+            </Grid>
+            <Grid item={true} xs={2}>
+              <Paper className={classes.paper} elevation={0} />
+            </Grid>
+            <Grid item={true} xs={8}>
+              <Paper className={classes.paper} elevation={1}>
+                <Organisations organisations={organisations} />
+              </Paper>
+            </Grid>
+            <Grid item={true} xs={2}>
+              <Paper className={classes.paper} elevation={0} />
+            </Grid>
           </Grid>
-          <Grid item={true} xs={8}>
-            <Paper className={classes.paper} elevation={1}>
-              <Organisations organisations={this.props.organisations} />
-            </Paper>
-          </Grid>
-          <Grid item={true} xs={2}>
-            <Paper className={classes.paper} elevation={0} />
-          </Grid>
-        </Grid>
+        )}
       </div>
     )
   }
@@ -90,7 +109,11 @@ CHome.propTypes = {
   classes: PropTypes.object.isRequired
 }
 const mapStateToProps = state => {
-  return { organisations: state.HomeReducer.organisations }
+  return {
+    organisations: state.HomeReducer.organisations,
+    user_organisation: state.HomeReducer.user_organisation,
+    shifts: state.HomeReducer.shifts
+  }
 }
 const mapDispatchToProps = dispatch => {
   return {

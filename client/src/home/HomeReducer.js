@@ -1,6 +1,6 @@
 import _ from "lodash"
 const HomeReducer = (state, action) => {
-  if (state === undefined) return { organisations: [] }
+  if (state === undefined) return { organisations: [], user_organisation: null }
 
   switch (action.type) {
     case "HOME":
@@ -64,6 +64,20 @@ const HomeReducer = (state, action) => {
           }
         })
       return { ...state, error: false }
+    case "JOIN_ORGANISATION":
+      return { ...state, error: null }
+    case "JOIN_ORGANISATION_FAIL":
+      console.log("1")
+      return { ...state, error: action.error.response }
+    case "JOIN_ORGANISATION_SUCCESS":
+      console.log("2")
+      console.log(action.data)
+      return {
+        ...state,
+        user_organisation: action.data.organisation,
+        shifts: action.data.shifts,
+        error: false
+      }
     default:
       return state
   }

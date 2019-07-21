@@ -47,7 +47,7 @@ module Api
 
       # JOIN
       def join
-        if current_user.update(organisation_id: params[:organisation_id])
+        if current_user.update(organisation_id: params[:id])
           data = User.home(current_user.organisation, page_params)
           render json: data, status: :created, location: [:api, current_user]
         else
@@ -60,6 +60,12 @@ module Api
       def user_params
         params.require(:user).permit(:email, :name,
                                      :password, :password_confirmation)
+      end
+
+      def page_params
+        params[:page] = params[:page] || 1
+        params[:per_page] = params[:per_page] || 20
+        params
       end
     end
   end

@@ -16,7 +16,8 @@ import PersonAddIcon from "@material-ui/icons/PersonAdd"
 import {
   deleteOrganisation,
   newOrganisationShow,
-  editOrganisationShow
+  editOrganisationShow,
+  joinOrganisation
 } from "../home/HomeAction"
 import { connect } from "react-redux"
 import getCookie from "../common/cookie"
@@ -117,6 +118,17 @@ function FList(props) {
       })
     }
   }
+  const handleJoin = (event, id) => {
+    event.stopPropagation()
+    const authToken = getCookie("auth_token")
+    if (authToken !== "") {
+      console.log(authToken)
+      props.joinOrganisation({
+        auth_token: authToken,
+        id: id
+      })
+    }
+  }
   const handleData = data => {
     setOpen(data)
   }
@@ -201,7 +213,10 @@ function FList(props) {
                       />
                     </Tooltip>
                     <Tooltip title="Join">
-                      <PersonAddIcon className={classes.icon} />
+                      <PersonAddIcon
+                        className={classes.icon}
+                        onClick={event => handleJoin(event, row.id)}
+                      />
                     </Tooltip>
                   </TableCell>
                 </TableRow>
@@ -230,7 +245,8 @@ const mapDispatchToProps = dispatch => {
   return {
     deleteOrganisation: params => dispatch(deleteOrganisation(params)),
     newOrganisationShow: () => dispatch(newOrganisationShow()),
-    editOrganisationShow: () => dispatch(editOrganisationShow())
+    editOrganisationShow: () => dispatch(editOrganisationShow()),
+    joinOrganisation: params => dispatch(joinOrganisation(params))
   }
 }
 const List = connect(

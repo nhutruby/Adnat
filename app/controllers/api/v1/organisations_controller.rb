@@ -47,7 +47,7 @@ module Api
 
       def page_params
         params[:page] = params[:page] || 1
-        params[:per_page] = params[:per_page] || 5
+        params[:per_page] = params[:per_page] || 20
         params
       end
     end

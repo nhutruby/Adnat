@@ -6,7 +6,7 @@ Rails.application.routes.draw do
             path: '/' do
     scope module: :v1,
           constraints: Versions.new(version: 1, default: true) do
-      resources :users, only: %i[show create update destroy me] do
+      resources :users, only: %i[show create update destroy me join] do
         post 'me', on: :collection
         put 'join', on: :collection
       end
