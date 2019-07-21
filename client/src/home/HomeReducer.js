@@ -1,21 +1,53 @@
+import _ from "lodash"
 const HomeReducer = (state, action) => {
-  if (state === undefined) return {}
+  if (state === undefined) return { organisations: [] }
 
   switch (action.type) {
-    case 'HOME':
+    case "HOME":
+      return {
+        ...state
+      }
+    case "HOME_FAIL":
       return {
         ...state,
+        error: action.message
       }
-    case 'HOME_FAIL':
+    case "HOME_SUCCESS":
       return {
         ...state,
-        error: action.message,
+        organisations: _.uniqBy(
+          state.organisations.concat(action.data.organisations),
+          "id"
+        )
       }
-    case 'HOME_SUCCESS':
-      console.log(action.data.organisations)
+    case "DELETE_ORGANISATION":
+      return { ...state, delete_organisation_id: action.payload.id }
+    case "DELETE_ORGANISATION_FAIL":
+      return { ...state }
+    case "DELETE_ORGANISATION_SUCCESS":
+      if (action.status === 204) {
+        const organisations = state.organisations.filter(
+          item => item.id !== state.delete_organisation_id
+        )
+        return {
+          ...state,
+          organisations: organisations,
+          delete_organisation_id: null
+        }
+      } else {
+        return { ...state }
+      }
+    case "NEW_ORGANISATION_SHOW":
+      return { ...state, error: null }
+    case "NEW_ORGANISATION":
+      return { ...state, error: null }
+    case "NEW_ORGANISATION_FAIL":
+      return { ...state, error: action.error.response.data }
+    case "NEW_ORGANISATION_SUCCESS":
       return {
         ...state,
         organisations: action.data.organisations,
+        error: false
       }
     default:
       return state

@@ -11,7 +11,7 @@ Rails.application.routes.draw do
       end
       resources :sessions, only: %i[create destroy]
       resources :home, only: %i[index]
-      resources :organisations, only: %i[index show create update destroy]
+      resources :organisations, only: %i[create update destroy]
     end
   end
 end

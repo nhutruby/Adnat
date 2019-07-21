@@ -1,49 +1,107 @@
-import React from 'react'
-import {makeStyles} from '@material-ui/core/styles'
-import Table from '@material-ui/core/Table'
-import TableBody from '@material-ui/core/TableBody'
-import TableCell from '@material-ui/core/TableCell'
-import TableHead from '@material-ui/core/TableHead'
-import TableRow from '@material-ui/core/TableRow'
-import Paper from '@material-ui/core/Paper'
-import Grid from '@material-ui/core/Grid'
-import Button from '@material-ui/core/Button'
-import Tooltip from '@material-ui/core/Tooltip'
-import DeleteIcon from '@material-ui/icons/Delete'
-import EditIcon from '@material-ui/icons/Edit'
-import PersonAddIcon from '@material-ui/icons/PersonAdd'
-const useStyles = makeStyles(theme => ({
+import React, { lazy } from "react"
+import PropTypes from "prop-types"
+import { withStyles } from "@material-ui/core/styles"
+import Table from "@material-ui/core/Table"
+import TableBody from "@material-ui/core/TableBody"
+import TableCell from "@material-ui/core/TableCell"
+import TableHead from "@material-ui/core/TableHead"
+import TableRow from "@material-ui/core/TableRow"
+import Paper from "@material-ui/core/Paper"
+import Grid from "@material-ui/core/Grid"
+import Button from "@material-ui/core/Button"
+import Tooltip from "@material-ui/core/Tooltip"
+import DeleteIcon from "@material-ui/icons/Delete"
+import EditIcon from "@material-ui/icons/Edit"
+import PersonAddIcon from "@material-ui/icons/PersonAdd"
+import { deleteOrganisation, newOrganisationShow } from "../home/HomeAction"
+import { connect } from "react-redux"
+import getCookie from "../common/cookie"
+import Dialog from "@material-ui/core/Dialog"
+import DialogContent from "@material-ui/core/DialogContent"
+const New = lazy(() => import("./New"))
+const styles = theme => ({
   root: {
-    width: '100%',
-    marginTop: theme.spacing(3),
+    width: "100%",
+    marginTop: theme.spacing(1)
   },
   table: {
-    minWidth: 650,
+    minWidth: 100
   },
   icon: {
     margin: theme.spacing(2),
+    "&:hover": {
+      cursor: "pointer"
+    }
   },
   button: {
     margin: theme.spacing(2),
-    textTransform: 'none',
-  },
-}))
+    textTransform: "none"
+  }
+})
+class FormDialog extends React.Component {
+  handleClose = () => {
+    this.props.handlerFromParent(false)
+  }
+  handleData = data => {
+    this.props.handlerFromParent(this.props.handlerFromFormDialog)
+  }
 
-function createData(name, calories, fat, carbs, protein) {
-  return {name, calories, fat, carbs, protein}
+  render() {
+    const { dialogShow, maxWidth, rowsPerPage } = this.props
+    let form
+    switch (dialogShow) {
+      case "new":
+        form = (
+          <New
+            handlerFromFormDialog={this.handleData}
+            rowsPerPage={rowsPerPage}
+          />
+        )
+        break
+      default:
+    }
+
+    return (
+      <div>
+        <Dialog
+          open={this.props.open ? true : false}
+          onClose={this.handleClose}
+          fullWidth={true}
+          maxWidth={maxWidth}
+          aria-labelledby="form-dialog-title"
+        >
+          <DialogContent>{form}</DialogContent>
+        </Dialog>
+      </div>
+    )
+  }
 }
-
-const rows = [
-  createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-  createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-  createData('Eclair', 262, 16.0, 24, 6.0),
-  createData('Cupcake', 305, 3.7, 67, 4.3),
-  createData('Gingerbread', 356, 16.0, 49, 3.9),
-]
-
-export default function SimpleTable() {
-  const classes = useStyles()
-
+function FList(props) {
+  const { classes } = props
+  const [open, setOpen] = React.useState(false)
+  const [dialogShow, setDialogShow] = React.useState()
+  const [maxWidth, setMaxWidth] = React.useState()
+  const [rowsPerPage] = React.useState(20)
+  const handleDeleteClick = (event, id) => {
+    event.stopPropagation()
+    const authToken = getCookie("auth_token")
+    if (authToken !== "") {
+      props.deleteOrganisation({
+        auth_token: authToken,
+        id: id
+      })
+    }
+  }
+  const handleData = data => {
+    setOpen(data)
+  }
+  const handleNewOrganisation = (event, maxWidth) => {
+    event.stopPropagation()
+    setOpen(true)
+    setDialogShow("new")
+    setMaxWidth(maxWidth)
+    props.newOrganisationShow()
+  }
   return (
     <div>
       <p>
@@ -57,7 +115,7 @@ export default function SimpleTable() {
             variant="contained"
             color="primary"
             className={classes.button}
-            onClick={event => this.handleNew(event, 'sm')}
+            onClick={event => handleNewOrganisation(event, "sm")}
           >
             New
           </Button>
@@ -73,28 +131,55 @@ export default function SimpleTable() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map(row => (
-              <TableRow key={row.name}>
-                <TableCell component="th" scope="row">
-                  {row.name}
-                </TableCell>
-                <TableCell align="right">{row.calories}</TableCell>
-                <TableCell align="right">
-                  <Tooltip title="Edit">
-                    <EditIcon className={classes.icon} />
-                  </Tooltip>
-                  <Tooltip title="Delete">
-                    <DeleteIcon className={classes.icon} />
-                  </Tooltip>
-                  <Tooltip title="Join">
-                    <PersonAddIcon className={classes.icon} />
-                  </Tooltip>
-                </TableCell>
-              </TableRow>
-            ))}
+            {props.organisations &&
+              props.organisations.map(row => (
+                <TableRow key={row.id}>
+                  <TableCell component="th" scope="row">
+                    {row.name}
+                  </TableCell>
+                  <TableCell align="right">{row.hourly_rate}</TableCell>
+                  <TableCell align="right">
+                    <Tooltip title="Edit">
+                      <EditIcon className={classes.icon} />
+                    </Tooltip>
+                    <Tooltip title="Delete">
+                      <DeleteIcon
+                        className={classes.icon}
+                        onClick={event => handleDeleteClick(event, row.id)}
+                      />
+                    </Tooltip>
+                    <Tooltip title="Join">
+                      <PersonAddIcon className={classes.icon} />
+                    </Tooltip>
+                  </TableCell>
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
       </Paper>
+      <FormDialog
+        open={open}
+        handlerFromParent={handleData}
+        dialogShow={dialogShow}
+        maxWidth={maxWidth}
+        rowsPerPage={rowsPerPage}
+      />
     </div>
   )
 }
+
+FList.propTypes = {
+  classes: PropTypes.object.isRequired
+}
+const mapDispatchToProps = dispatch => {
+  return {
+    deleteOrganisation: params => dispatch(deleteOrganisation(params)),
+    newOrganisationShow: () => dispatch(newOrganisationShow())
+  }
+}
+const List = connect(
+  null,
+  mapDispatchToProps
+)(FList)
+
+export default withStyles(styles)(List)

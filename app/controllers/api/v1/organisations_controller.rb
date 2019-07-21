@@ -5,27 +5,17 @@ module Api
     # Organisations controller
     class OrganisationsController < ApplicationController
       before_action :set_organisation, only: %i[show update destroy]
-
-      # GET /organisations
-      def index
-        @organisations = Organisation.all
-
-        render json: @organisations
-      end
-
-      # GET /organisations/1
-      def show
-        render json: @organisation
-      end
+      before_action :authenticate_with_token!
 
       # POST /organisations
       def create
         @organisation = Organisation.new(organisation_params)
 
         if @organisation.save
-          render json: @organisation, status: :created, location: @organisation
+          data = User.home(current_user.organisation, page_params)
+          render json: data, status: :created, location:  [:api, @organisation]
         else
-          render json: @organisation.errors, status: :unprocessable_entity
+          render json: @organisation.errors.full_messages, status: :unprocessable_entity
         end
       end
 
@@ -52,7 +42,13 @@ module Api
 
       # Only allow a trusted parameter "white list" through.
       def organisation_params
-        params.fetch(:organisation, {})
+        params.fetch(:organisation, {}).permit(:name, :hourly_rate)
+      end
+
+      def page_params
+        params[:page] = params[:page] || 1
+        params[:per_page] = params[:per_page] || 5
+        params
       end
     end
   end

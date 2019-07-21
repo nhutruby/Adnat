@@ -6,8 +6,6 @@ module Api
     class HomeController < ApplicationController
       before_action :authenticate_with_token!
       def index
-        puts 'aaaaa'
-        puts current_user.name
         data = User.home(current_user.organisation, home_params)
         render json: data
       end

@@ -33,7 +33,7 @@ class Welcome extends React.Component {
     const {classes, store} = this.props
     return (
       <div className={classes.root}>
-        <Grid container={true} spacing={3}>
+        <Grid container={true} spacing={1}>
           <Grid item={true} xs={12}>
             <Paper className={classes.paper} elevation={1}>
               <LogIn store={store} />

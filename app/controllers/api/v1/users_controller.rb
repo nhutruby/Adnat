@@ -12,11 +12,9 @@ module Api
 
       def me
         if current_user
-          puts 'sss'
           render json: current_user.serializable_hash(only: :name),
                  status: 200, location: [:api, current_user]
         else
-          puts 'eer'
           render json: { error: 'Authorization Fail' }, status: 422
         end
       end
