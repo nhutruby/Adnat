@@ -61,3 +61,21 @@ export const leaveOrganisationFail = error => {
 export const newShiftShow = error => {
   return { type: "NEW_ORGANISATION_SHOW" }
 }
+export const newShift = params => {
+  return { type: "NEW_SHIFT", payload: params }
+}
+export const newShiftSuccess = () => {
+  return { type: "NEW_SHIFT_SUCCESS" }
+}
+export const newShiftFail = error => {
+  return { type: "NEW_SHIFT_FAIL", error: error }
+}
+export const deleteShift = params => {
+  return { type: "DELETE_SHIFT", payload: params }
+}
+export const deleteShiftSuccess = () => {
+  return { type: "DELETE_SHIFT_SUCCESS" }
+}
+export const deleteShiftFail = error => {
+  return { type: "DELETE_SHIFT_FAIL", error: error }
+}

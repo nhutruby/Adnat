@@ -12,17 +12,17 @@ import Button from "@material-ui/core/Button"
 import Tooltip from "@material-ui/core/Tooltip"
 import DeleteIcon from "@material-ui/icons/Delete"
 import EditIcon from "@material-ui/icons/Edit"
-import PersonAddIcon from "@material-ui/icons/PersonAdd"
 import {
-  deleteOrganisation,
+  deleteShift,
   newShiftShow,
-  editOrganisationShow,
-  joinOrganisation
+  editOrganisationShow
 } from "../home/HomeAction"
 import { connect } from "react-redux"
 import getCookie from "../common/cookie"
 import Dialog from "@material-ui/core/Dialog"
 import DialogContent from "@material-ui/core/DialogContent"
+import { format } from "date-fns"
+
 const New = lazy(() => import("./New"))
 const Edit = lazy(() => import("./Edit"))
 const styles = theme => ({
@@ -112,17 +112,7 @@ function FList(props) {
     event.stopPropagation()
     const authToken = getCookie("auth_token")
     if (authToken !== "") {
-      props.deleteOrganisation({
-        auth_token: authToken,
-        id: id
-      })
-    }
-  }
-  const handleJoin = (event, id) => {
-    event.stopPropagation()
-    const authToken = getCookie("auth_token")
-    if (authToken !== "") {
-      props.joinOrganisation({
+      props.deleteShift({
         auth_token: authToken,
         id: id
       })
@@ -133,7 +123,6 @@ function FList(props) {
   }
   const handleNewShift = (event, maxWidth) => {
     event.stopPropagation()
-    console.log("mm")
     setOpen(true)
     setDialogShow("new")
     setMaxWidth(maxWidth)
@@ -159,7 +148,7 @@ function FList(props) {
     <div>
       <h3> Shifts </h3>
       <Paper className={classes.root} elevation={0}>
-        <Grid container={true} wrap="nowrap" spacing={1}>
+        <Grid container={true} wrap="nowrap" spacing={0}>
           <Button
             variant="contained"
             color="primary"
@@ -176,18 +165,34 @@ function FList(props) {
             <Table className={classes.table}>
               <TableHead>
                 <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell align="right">Hourly Rate</TableCell>
-                  <TableCell align="right">Actions</TableCell>
+                  <TableCell>Employee Name</TableCell>
+                  <TableCell align="right">Shift Date</TableCell>
+                  <TableCell align="right">Start Time</TableCell>
+                  <TableCell align="right">Finish Time</TableCell>
+                  <TableCell align="right">Break Length (minutes)</TableCell>
+                  <TableCell align="right">Hours Worked</TableCell>
+                  <TableCell align="right">Shift Cost</TableCell>
+                  <TableCell align="right">Action</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {props.shfts.map(row => (
+                {props.shifts.map(row => (
                   <TableRow key={row.id}>
                     <TableCell component="th" scope="row">
-                      {row.name}
+                      {row.user && row.user.name}
                     </TableCell>
-                    <TableCell align="right">{row.hourly_rate}</TableCell>
+                    <TableCell align="right">
+                      {format(new Date(row.start_time), "MM/dd/yyyy")}
+                    </TableCell>
+                    <TableCell align="right">
+                      {format(new Date(row.start_time), "h:mm:a")}
+                    </TableCell>
+                    <TableCell align="right">
+                      {format(new Date(row.end_time), "h:mm:a")}
+                    </TableCell>
+                    <TableCell align="right">{row.break_length}</TableCell>
+                    <TableCell align="right" />
+                    <TableCell align="right" />
                     <TableCell align="right">
                       <Tooltip title="Edit">
                         <EditIcon
@@ -207,12 +212,6 @@ function FList(props) {
                         <DeleteIcon
                           className={classes.icon}
                           onClick={event => handleDeleteClick(event, row.id)}
-                        />
-                      </Tooltip>
-                      <Tooltip title="Join">
-                        <PersonAddIcon
-                          className={classes.icon}
-                          onClick={event => handleJoin(event, row.id)}
                         />
                       </Tooltip>
                     </TableCell>
@@ -250,10 +249,9 @@ const mapStateToProps = state => {
 }
 const mapDispatchToProps = dispatch => {
   return {
-    deleteOrganisation: params => dispatch(deleteOrganisation(params)),
+    deleteShift: params => dispatch(deleteShift(params)),
     newShiftShow: () => dispatch(newShiftShow()),
-    editOrganisationShow: kind => dispatch(editOrganisationShow(kind)),
-    joinOrganisation: params => dispatch(joinOrganisation(params))
+    editOrganisationShow: kind => dispatch(editOrganisationShow(kind))
   }
 }
 const List = connect(

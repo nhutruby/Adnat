@@ -45,11 +45,20 @@ module Api
         head 204
       end
 
+      # rubocop:disable all
       # JOIN
       def join
         if current_user.update(organisation_id: params[:id])
           data = User.home(current_user.organisation, page_params)
-          render json: data, status: 200, location: [:api, current_user]
+          render json: { organisations: data[:organisations],
+                         organisation: data[:organisation],
+                         shifts:
+                             if data[:shifts].present?
+                               JSON.parse(data[:shifts].to_json(only: %I[_id start_time end_time break_length],
+                                                     include: { user: { only: :name } }))
+                             else
+                               []
+                             end }, status: 200, location: [:api, current_user]
         else
           render json: current_user.errors.full_messages, status: :unprocessable_entity
         end
@@ -57,6 +66,7 @@ module Api
 
       # LEAVE
       def leave
+        Shift.where(user_id: current_user.id).destroy_all
         if current_user.update(organisation_id: nil)
           data = User.home(current_user.organisation, page_params)
           render json: data, status: 200, location: [:api, current_user]
@@ -64,6 +74,7 @@ module Api
           render json: current_user.errors.full_messages, status: :unprocessable_entity
         end
       end
+      # rubocop:enable all
 
       private
 

@@ -119,6 +119,43 @@ function* workerLeaveOrganisation() {
     }
   }
 }
+function newShift(params) {
+  setHeader(params.auth_token)
+  delete params.auth_token
+  return axios.post("/shifts", params)
+}
+
+function* workerNewShift() {
+  while (true) {
+    try {
+      const request = yield take("NEW_SHIFT")
+      const params = request.payload
+      const response = yield call(newShift, params)
+      const data = response.data
+      yield put({ type: "NEW_SHIFT_SUCCESS", data })
+    } catch (error) {
+      yield put({ type: "NEW_SHIFT_FAIL", error })
+    }
+  }
+}
+function deleteShift(params) {
+  setHeader(params.auth_token)
+  return axios.delete("/shifts/" + params.id)
+}
+
+function* workerDeleteShift() {
+  while (true) {
+    try {
+      const request = yield take("DELETE_SHIFT")
+      const params = request.payload
+      const response = yield call(deleteShift, params)
+      const status = response.status
+      yield put({ type: "DELETE_SHIFT_SUCCESS", status })
+    } catch (error) {
+      yield put({ type: "DELETE_SHIFT_FAIL", error })
+    }
+  }
+}
 export default function* watcherSearch() {
   yield fork(workerHome)
   yield fork(workerDeleteOrganisation)
@@ -126,4 +163,6 @@ export default function* watcherSearch() {
   yield fork(workerEditOrganisation)
   yield fork(workerJoinOrganisation)
   yield fork(workerLeaveOrganisation)
+  yield fork(workerNewShift)
+  yield fork(workerDeleteShift)
 }

@@ -5,10 +5,20 @@ module Api
     # Home Controller
     class HomeController < ApplicationController
       before_action :authenticate_with_token!
+      # rubocop:disable all
       def index
         data = User.home(current_user.organisation, home_params)
-        render json: data
+        render json: { organisations: data[:organisations],
+                       organisation: data[:organisation],
+                       shifts:
+                           if data[:shifts].present?
+                             JSON.parse(data[:shifts].to_json(only: %I[_id start_time end_time break_length],
+                                                              include: { user: { only: :name } }))
+                           else
+                             []
+                           end }
       end
+      # rubocop:enable all
 
       private
 

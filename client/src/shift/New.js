@@ -8,7 +8,7 @@ import { withStyles } from "@material-ui/core/styles"
 import TextField from "@material-ui/core/TextField"
 import Typography from "@material-ui/core/Typography"
 import { connect } from "react-redux"
-import { newOrganisation } from "../home/HomeAction"
+import { newShift } from "../home/HomeAction"
 import getCookie from "../common/cookie"
 import DateFnsUtils from "@date-io/date-fns"
 import Grid from "@material-ui/core/Grid"
@@ -42,11 +42,12 @@ class CNew extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      name: "",
-      nameError: null,
-      hourly_rate: 0,
-      hourlyRateError: null,
-      selectedDate: new Date()
+      break_length: 0,
+      selectedStartTime: new Date(),
+      selectedEndTime: new Date(),
+      starTimeError: null,
+      endTimeError: null,
+      breakLengthError: null
     }
     this.handleValidate = this.handleValidate.bind(this)
     this.handleChange = this.handleChange.bind(this)
@@ -60,26 +61,39 @@ class CNew extends React.Component {
     this.setState({ [e.target.id]: e.target.value })
     this.handleValidate()
   }
-  handleDateChange = e => {
-    console.log(e)
-    //this.setState({ [e.target.id]: e.target.value })
+  handleStartTimeChange = data => {
+    this.setState({ startTimeError: null })
+    if (data === null) {
+      data = new Date()
+    }
+    this.setState({ selectedStartTime: data })
+    if (data && data.toString() === "Invalid Date") {
+      this.setState({ startTimeError: "Start Time is not valid" })
+    }
+  }
+  handleEndTimeChange = data => {
+    this.setState({ endTimeError: null })
+    if (data === null) {
+      data = new Date()
+    }
+    this.setState({ selectedEndTime: new Date(data) })
+    if (data && data.toString() === "Invalid Date") {
+      this.setState({ endTimeError: "End Time is not valid" })
+    }
   }
   handleValidate = () => {
     const formEl = this.formEl
     const formLength = formEl.length
-    this.setState({ nameError: null, hourlyRateError: null })
+    this.setState({ breakLengthError: null })
     if (formEl.checkValidity() === false) {
       for (let i = 0; i < formLength; i++) {
         const elem = formEl[i]
         if (elem.nodeName.toLowerCase() !== "button") {
           if (!elem.validity.valid) {
             switch (elem.name) {
-              case "name":
-                this.setState({ nameError: "Name: " + elem.validationMessage })
-                break
-              case "hourly_rate":
+              case "break_length":
                 this.setState({
-                  hourlyRateError: "Hourly Rate: " + elem.validationMessage
+                  breakLengthError: "Break Length: " + elem.validationMessage
                 })
                 break
               default:
@@ -87,20 +101,24 @@ class CNew extends React.Component {
           }
         }
       }
-      return false
-    } else {
-      return true
     }
   }
   handleSubmit = event => {
     event.preventDefault()
-    if (this.handleValidate()) {
+    this.handleValidate()
+    if (
+      this.state.starTimeError === null &&
+      this.state.endTimeError === null &&
+      this.state.breakLengthError === null
+    ) {
       const authToken = getCookie("auth_token")
       if (authToken !== "") {
-        this.props.newOrganisation({
-          name: this.state.name,
-          hourly_rate: this.state.hourly_rate,
+        this.props.newShift({
+          start_time: this.state.selectedStartTime,
+          end_time: this.state.selectedEndTime,
+          break_length: this.state.break_length,
           per_page: this.props.rowsPerPage,
+          organisation_id: this.props.user_organisation.id,
           auth_token: authToken
         })
       }
@@ -113,25 +131,30 @@ class CNew extends React.Component {
     }
   }
   render() {
-    const { classes, selectedDate } = this.props
+    const { classes } = this.props
 
     return (
       <div>
-        <DialogTitle id="form-dialog-title">New Organisation</DialogTitle>
+        <DialogTitle id="form-dialog-title">New Shift</DialogTitle>
 
         <form
           ref={form => (this.formEl = form)}
           onSubmit={this.handleSubmit}
           noValidate
         >
-          {this.state.nameError && (
+          {this.state.startTimeError && (
             <div className={classes.error}>
-              <label> {this.state.nameError}</label>
+              <label> {this.state.startTimeError}</label>
             </div>
           )}
-          {this.state.hourlyRateError && (
+          {this.state.endTimeError && (
             <div className={classes.error}>
-              <label> {this.state.hourlyRateError}</label>
+              <label> {this.state.endTimeError}</label>
+            </div>
+          )}
+          {this.state.breakLengthError && (
+            <div className={classes.error}>
+              <label> {this.state.breakLengthError}</label>
             </div>
           )}
           {this.props.error && (
@@ -146,33 +169,49 @@ class CNew extends React.Component {
                 id="shift_date"
                 name="shift_date"
                 label="Shift Date"
-                value={selectedDate}
-                onChange={this.handleDateChange}
+                value={this.state.selectedStartTime}
+                onChange={this.handleStartTimeChange}
                 KeyboardButtonProps={{
                   "aria-label": "change date"
                 }}
+                required={true}
               />
               <KeyboardTimePicker
                 margin="normal"
                 id="start_time"
                 name="start_time"
                 label="Start Time"
-                value={selectedDate}
-                onChange={this.handleDateChange}
+                value={this.state.selectedStartTime}
+                onChange={this.handleStartTimeChange}
                 KeyboardButtonProps={{
                   "aria-label": "change time"
                 }}
+                required={true}
+              />
+            </Grid>
+          </MuiPickersUtilsProvider>
+          <MuiPickersUtilsProvider utils={DateFnsUtils}>
+            <Grid container className={classes.grid} justify="space-around">
+              <KeyboardTimePicker
+                margin="normal"
+                id="end_time"
+                name="end_time"
+                label="End Time"
+                value={this.state.selectedEndTime}
+                onChange={this.handleEndTimeChange}
+                KeyboardButtonProps={{
+                  "aria-label": "change time"
+                }}
+                required={true}
               />
               <TextField
                 id="break_length"
                 name="break_length"
                 label="Break Length"
-                value={this.state.hourly_rate}
+                value={this.state.break_length}
                 onChange={this.handleChange}
                 type="number"
                 className={classes.textField}
-                margin="normal"
-                variant="outlined"
                 inputProps={{
                   min: 0
                 }}
@@ -180,7 +219,6 @@ class CNew extends React.Component {
               />
             </Grid>
           </MuiPickersUtilsProvider>
-
           <Typography component="pre">
             <DialogActions>
               <Button
@@ -211,12 +249,13 @@ CNew.propTypes = {
 }
 const mapDispatchToProps = dispatch => {
   return {
-    newOrganisation: params => dispatch(newOrganisation(params))
+    newShift: params => dispatch(newShift(params))
   }
 }
 const mapStateToProps = state => {
   return {
-    error: state.HomeReducer.error
+    error: state.HomeReducer.error,
+    user_organisation: state.HomeReducer.user_organisation
   }
 }
 const New = connect(

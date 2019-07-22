@@ -13,21 +13,27 @@ module Api
         render json: @shifts
       end
 
-      # GET /shifts/1
-      def show
-        render json: @shift
-      end
-
+      # rubocop:disable all
       # POST /shifts
       def create
         @shift = Shift.new(shift_params)
-
+        @shift.user = current_user
         if @shift.save
-          render json: @shift, status: :created, location: @shift
+          data = User.home(current_user.organisation, page_params)
+          render json: { organisations: data[:organisations],
+                         organisation: data[:organisation],
+                         shifts:
+                             if data[:shifts].present?
+                               JSON.parse(data[:shifts].to_json(only: %I[_id start_time end_time break_length],
+                                                     include: { user: { only: :name } }))
+                             else
+                               []
+                             end }, status: :created, location: [:api, @shift]
         else
-          render json: @shift.errors, status: :unprocessable_entity
+          render json: @shift.errors.full_messages, status: :unprocessable_entity
         end
       end
+      # rubocop:enable all
 
       # PATCH/PUT /shifts/1
       def update
@@ -52,7 +58,13 @@ module Api
 
       # Only allow a trusted parameter "white list" through.
       def shift_params
-        params.fetch(:shift, {})
+        params.fetch(:shift, {}).permit(:start_time, :end_time, :break_length, :organisation_id)
+      end
+
+      def page_params
+        params[:page] = params[:page] || 1
+        params[:per_page] = params[:per_page] || 20
+        params
       end
     end
   end

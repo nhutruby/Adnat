@@ -1,6 +1,7 @@
 import _ from "lodash"
 const HomeReducer = (state, action) => {
-  if (state === undefined) return { organisations: [], user_organisation: null }
+  if (state === undefined)
+    return { organisations: [], shifts: [], user_organisation: null }
 
   switch (action.type) {
     case "HOME":
@@ -13,23 +14,25 @@ const HomeReducer = (state, action) => {
         error: action.message
       }
     case "HOME_SUCCESS":
-      if (action.data.organisations) {
-        return {
-          ...state,
-          organisations: _.uniqBy(
+      let organisations
+      action.data.organisations
+        ? (organisations = _.uniqBy(
             state.organisations.concat(action.data.organisations),
             "id"
-          ),
-          user_organisation: action.data.organisation,
-          shifts: action.data.shifts
-        }
-      } else {
-        return {
-          ...state,
-          user_organisation: action.data.organisation,
-          shifts: action.data.shifts
-        }
+          ))
+        : (organisations = action.data.organisations)
+      let shifts
+      action.data.shifts
+        ? (shifts = _.uniqBy(state.shifts.concat(action.data.shifts), "id"))
+        : (shifts = action.data.shifts)
+
+      return {
+        ...state,
+        organisations: organisations,
+        user_organisation: action.data.organisation,
+        shifts: shifts
       }
+
     case "DELETE_ORGANISATION":
       return { ...state, delete_organisation_id: action.payload.id }
     case "DELETE_ORGANISATION_FAIL":
@@ -111,6 +114,33 @@ const HomeReducer = (state, action) => {
       }
     case "NEW_SHIFT_SHOW":
       return { ...state, error: null }
+    case "NEW_SHIFT":
+      return { ...state, error: null }
+    case "NEW_SHIFT_FAIL":
+      return { ...state, error: action.error.response.data }
+    case "NEW_SHIFT_SUCCESS":
+      return {
+        ...state,
+        shifts: action.data.shifts,
+        error: false
+      }
+    case "DELETE_SHIFT":
+      return { ...state, delete_shift_id: action.payload.id }
+    case "DELETE_SHIFT_FAIL":
+      return { ...state }
+    case "DELETE_SHIFT_SUCCESS":
+      if (action.status === 204) {
+        const shifts = state.shifts.filter(
+          item => item.id !== state.delete_shift_id
+        )
+        return {
+          ...state,
+          shifts: shifts,
+          delete_shift_id: null
+        }
+      } else {
+        return { ...state }
+      }
     default:
       return state
   }

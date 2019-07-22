@@ -67,7 +67,7 @@ class CHome extends React.Component {
     return (
       <div className={classes.root}>
         {user_organisation != null ? (
-          <Grid container={true} spacing={3}>
+          <Grid container={true} spacing={0}>
             <Grid item={true} xs={12}>
               <Paper className={classes.paper} elevation={1}>
                 <Header />
@@ -84,20 +84,14 @@ class CHome extends React.Component {
             <Grid item={true} xs={1}>
               <Paper className={classes.paper} elevation={0} />
             </Grid>
-            <Grid item={true} xs={1}>
-              <Paper className={classes.paper} elevation={0} />
-            </Grid>
-            <Grid item={true} xs={10}>
+            <Grid item={true} xs={12}>
               <Paper className={classes.paper} elevation={0}>
                 <Shifts />
               </Paper>
             </Grid>
-            <Grid item={true} xs={1}>
-              <Paper className={classes.paper} elevation={0} />
-            </Grid>
           </Grid>
         ) : (
-          <Grid container={true} spacing={3}>
+          <Grid container={true} spacing={0}>
             <Grid item={true} xs={12}>
               <Paper className={classes.paper} elevation={1}>
                 <Header />
