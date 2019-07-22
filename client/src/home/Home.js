@@ -12,6 +12,7 @@ import { connect } from "react-redux"
 import getCookie from "../common/cookie"
 const Grid = lazy(() => import("@material-ui/core/Grid"))
 const Header = lazy(() => import("../header/Header"))
+const ShowOrganisation = lazy(() => import("../organisation/Show"))
 const styles = theme => ({
   root: {
     flexGrow: 1
@@ -75,7 +76,9 @@ class CHome extends React.Component {
               <Paper className={classes.paper} elevation={0} />
             </Grid>
             <Grid item={true} xs={10}>
-              <Paper className={classes.paper} elevation={1} />
+              <Paper className={classes.paper} elevation={0}>
+                <ShowOrganisation user_organisation={user_organisation} />
+              </Paper>
             </Grid>
             <Grid item={true} xs={1}>
               <Paper className={classes.paper} elevation={0} />
@@ -109,6 +112,7 @@ CHome.propTypes = {
   classes: PropTypes.object.isRequired
 }
 const mapStateToProps = state => {
+  console.log(state.HomeReducer.shifts)
   return {
     organisations: state.HomeReducer.organisations,
     user_organisation: state.HomeReducer.user_organisation,
