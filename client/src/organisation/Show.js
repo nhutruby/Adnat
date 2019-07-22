@@ -7,16 +7,16 @@ import EditIcon from "@material-ui/icons/Edit"
 import LeaveIcon from "@material-ui/icons/RemoveCircle"
 import Dialog from "@material-ui/core/Dialog"
 import DialogContent from "@material-ui/core/DialogContent"
-import { editOrganisationShow } from "../home/HomeAction"
+import { editOrganisationShow, leaveOrganisation } from "../home/HomeAction"
 import { connect } from "react-redux"
+import getCookie from "../common/cookie"
 const Edit = lazy(() => import("./Edit"))
 const useStyles = makeStyles(theme => ({
   root: {
     padding: theme.spacing(3, 2),
-    display: "inline-flex",
     justifyContent: "center",
     alignItems: "center",
-    textAlign: "right"
+    textAlign: "left"
   },
 
   icon: {
@@ -33,9 +33,16 @@ function FShow(props) {
   const [open, setOpen] = React.useState(false)
 
   const handleEditOrganisation = event => {
-    console.log("show")
     setOpen(true)
-    props.editOrganisationShow()
+    props.editOrganisationShow("item")
+  }
+  const handleLeave = event => {
+    const authToken = getCookie("auth_token")
+    if (authToken !== "") {
+      props.leaveOrganisation({
+        auth_token: authToken
+      })
+    }
   }
   const handleData = data => {
     setOpen(data)
@@ -56,7 +63,11 @@ function FShow(props) {
             />
           </Tooltip>
           <Tooltip title="Leave">
-            <LeaveIcon className={classes.icon} color="secondary" />
+            <LeaveIcon
+              className={classes.icon}
+              color="secondary"
+              onClick={event => handleLeave(event => event)}
+            />
           </Tooltip>
         </Typography>
         <Typography component="p" />
@@ -76,7 +87,8 @@ function FShow(props) {
 }
 const mapDispatchToProps = dispatch => {
   return {
-    editOrganisationShow: () => dispatch(editOrganisationShow())
+    editOrganisationShow: kind => dispatch(editOrganisationShow(kind)),
+    leaveOrganisation: params => dispatch(leaveOrganisation(params))
   }
 }
 const Show = connect(

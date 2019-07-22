@@ -60,19 +60,31 @@ const HomeReducer = (state, action) => {
         error: false
       }
     case "EDIT_ORGANISATION_SHOW":
-      return { ...state, error: null }
+      return { ...state, kind: action.payload, error: null }
     case "EDIT_ORGANISATION":
       return state
     case "EDIT_ORGANISATION_FAIL":
       return { ...state, error: action.error.response.data }
     case "EDIT_ORGANISATION_SUCCESS":
-      state.organisations &&
-        state.organisations.forEach(function(i) {
-          if (i.id === action.data.id) {
-            i.name = action.data.name
-            i.hourly_rate = action.data.hourly_rate
+      switch (state.kind) {
+        case "list":
+          state.organisations &&
+            state.organisations.forEach(function(i) {
+              if (i.id === action.data.id) {
+                i.name = action.data.name
+                i.hourly_rate = action.data.hourly_rate
+              }
+            })
+          break
+        case "item":
+          if (state.user_organisation && action.data) {
+            state.user_organisation.name = action.data.name
+            state.user_organisation.hourly_rate = action.data.hourly_rate
           }
-        })
+          break
+        default:
+      }
+
       return { ...state, error: false }
     case "JOIN_ORGANISATION":
       return { ...state, error: null }
@@ -85,6 +97,20 @@ const HomeReducer = (state, action) => {
         shifts: action.data.shifts,
         error: false
       }
+    case "LEAVE_ORGANISATION":
+      return { ...state, error: null }
+    case "LEAVE_ORGANISATION_FAIL":
+      return { ...state, error: action.error.response }
+    case "LEAVE_ORGANISATION_SUCCESS":
+      return {
+        ...state,
+        organisations: action.data.organisations,
+        user_organisation: null,
+        shifts: null,
+        error: false
+      }
+    case "NEW_SHIFT_SHOW":
+      return { ...state, error: null }
     default:
       return state
   }

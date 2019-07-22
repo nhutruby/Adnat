@@ -101,10 +101,29 @@ function* workerJoinOrganisation() {
     }
   }
 }
+function leaveOrganisation(params) {
+  setHeader(params.auth_token)
+  return axios.put("/users/leave")
+}
+
+function* workerLeaveOrganisation() {
+  while (true) {
+    try {
+      const request = yield take("LEAVE_ORGANISATION")
+      const params = request.payload
+      const response = yield call(leaveOrganisation, params)
+      const data = response.data
+      yield put({ type: "LEAVE_ORGANISATION_SUCCESS", data })
+    } catch (error) {
+      yield put({ type: "LEAVE_ORGANISATION_FAIL", error })
+    }
+  }
+}
 export default function* watcherSearch() {
   yield fork(workerHome)
   yield fork(workerDeleteOrganisation)
   yield fork(workerNewOrganisation)
   yield fork(workerEditOrganisation)
   yield fork(workerJoinOrganisation)
+  yield fork(workerLeaveOrganisation)
 }

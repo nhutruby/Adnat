@@ -28,8 +28,8 @@ export const newOrganisationSuccess = () => {
 export const newOrganisationFail = error => {
   return { type: "NEW_ORGANISATION_FAIL", error: error }
 }
-export const editOrganisationShow = error => {
-  return { type: "EDIT_ORGANISATION_SHOW" }
+export const editOrganisationShow = kind => {
+  return { type: "EDIT_ORGANISATION_SHOW", payload: kind }
 }
 export const editOrganisation = params => {
   return { type: "EDIT_ORGANISATION", payload: params }
@@ -48,4 +48,16 @@ export const joinOrganisationSuccess = () => {
 }
 export const joinOrganisationFail = error => {
   return { type: "JOIN_ORGANISATION_FAIL", error: error }
+}
+export const leaveOrganisation = params => {
+  return { type: "LEAVE_ORGANISATION", payload: params }
+}
+export const leaveOrganisationSuccess = () => {
+  return { type: "LEAVE_ORGANISATION_SUCCESS" }
+}
+export const leaveOrganisationFail = error => {
+  return { type: "LEAVE_ORGANISATION_FAIL", error: error }
+}
+export const newShiftShow = error => {
+  return { type: "NEW_ORGANISATION_SHOW" }
 }

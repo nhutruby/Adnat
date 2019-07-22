@@ -15,7 +15,7 @@ import EditIcon from "@material-ui/icons/Edit"
 import PersonAddIcon from "@material-ui/icons/PersonAdd"
 import {
   deleteOrganisation,
-  newOrganisationShow,
+  newShiftShow,
   editOrganisationShow,
   joinOrganisation
 } from "../home/HomeAction"
@@ -131,12 +131,13 @@ function FList(props) {
   const handleData = data => {
     setOpen(data)
   }
-  const handleNewOrganisation = (event, maxWidth) => {
+  const handleNewShift = (event, maxWidth) => {
     event.stopPropagation()
+    console.log("mm")
     setOpen(true)
     setDialogShow("new")
     setMaxWidth(maxWidth)
-    props.newOrganisationShow()
+    props.newShiftShow()
   }
   const handleEditOrganisation = (
     event,
@@ -156,73 +157,74 @@ function FList(props) {
   }
   return (
     <div>
-      <p>
-        You aren't a member of any organisations. Join an existing one or create
-        a new one.
-      </p>
-      <h2> Organisations </h2>
+      <h3> Shifts </h3>
       <Paper className={classes.root} elevation={0}>
         <Grid container={true} wrap="nowrap" spacing={1}>
           <Button
             variant="contained"
             color="primary"
             className={classes.button}
-            onClick={event => handleNewOrganisation(event, "sm")}
+            onClick={event => handleNewShift(event, "sm")}
           >
             New
           </Button>
         </Grid>
       </Paper>
-      <Paper className={classes.root}>
-        <Table className={classes.table}>
-          <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell align="right">Hourly Rate</TableCell>
-              <TableCell align="right">Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {props.organisations &&
-              props.organisations.map(row => (
-                <TableRow key={row.id}>
-                  <TableCell component="th" scope="row">
-                    {row.name}
-                  </TableCell>
-                  <TableCell align="right">{row.hourly_rate}</TableCell>
-                  <TableCell align="right">
-                    <Tooltip title="Edit">
-                      <EditIcon
-                        className={classes.icon}
-                        onClick={event =>
-                          handleEditOrganisation(
-                            event,
-                            row.id,
-                            row.name,
-                            row.hourly_rate,
-                            "sm"
-                          )
-                        }
-                      />
-                    </Tooltip>
-                    <Tooltip title="Delete">
-                      <DeleteIcon
-                        className={classes.icon}
-                        onClick={event => handleDeleteClick(event, row.id)}
-                      />
-                    </Tooltip>
-                    <Tooltip title="Join">
-                      <PersonAddIcon
-                        className={classes.icon}
-                        onClick={event => handleJoin(event, row.id)}
-                      />
-                    </Tooltip>
-                  </TableCell>
+      {props.shifts && props.shifts.length > 0 ? (
+        <div>
+          <Paper className={classes.root}>
+            <Table className={classes.table}>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Name</TableCell>
+                  <TableCell align="right">Hourly Rate</TableCell>
+                  <TableCell align="right">Actions</TableCell>
                 </TableRow>
-              ))}
-          </TableBody>
-        </Table>
-      </Paper>
+              </TableHead>
+              <TableBody>
+                {props.shfts.map(row => (
+                  <TableRow key={row.id}>
+                    <TableCell component="th" scope="row">
+                      {row.name}
+                    </TableCell>
+                    <TableCell align="right">{row.hourly_rate}</TableCell>
+                    <TableCell align="right">
+                      <Tooltip title="Edit">
+                        <EditIcon
+                          className={classes.icon}
+                          onClick={event =>
+                            handleEditOrganisation(
+                              event,
+                              row.id,
+                              row.name,
+                              row.hourly_rate,
+                              "sm"
+                            )
+                          }
+                        />
+                      </Tooltip>
+                      <Tooltip title="Delete">
+                        <DeleteIcon
+                          className={classes.icon}
+                          onClick={event => handleDeleteClick(event, row.id)}
+                        />
+                      </Tooltip>
+                      <Tooltip title="Join">
+                        <PersonAddIcon
+                          className={classes.icon}
+                          onClick={event => handleJoin(event, row.id)}
+                        />
+                      </Tooltip>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Paper>
+        </div>
+      ) : (
+        <div> No Data </div>
+      )}
       <FormDialog
         open={open}
         handlerFromParent={handleData}
@@ -242,13 +244,14 @@ FList.propTypes = {
 }
 const mapStateToProps = state => {
   return {
-    organisations: state.HomeReducer.organisations
+    user_organisation: state.HomeReducer.user_organisation,
+    shifts: state.HomeReducer.shifts
   }
 }
 const mapDispatchToProps = dispatch => {
   return {
     deleteOrganisation: params => dispatch(deleteOrganisation(params)),
-    newOrganisationShow: () => dispatch(newOrganisationShow()),
+    newShiftShow: () => dispatch(newShiftShow()),
     editOrganisationShow: kind => dispatch(editOrganisationShow(kind)),
     joinOrganisation: params => dispatch(joinOrganisation(params))
   }
