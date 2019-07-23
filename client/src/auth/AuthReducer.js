@@ -5,21 +5,25 @@ const AuthReducer = (state, action) => {
         name: ""
       },
       authorization: false,
-      isLoading: true
+      isLoading: false
     }
 
   switch (action.type) {
     case "AUTH":
+      console.log("start")
       return {
-        ...state
+        ...state,
+        isLoading: true
       }
     case "AUTH_FAIL":
+      console.log("fail")
       return {
         ...state,
         authorization: false,
         error: action.message
       }
     case "AUTH_SUCCESS":
+      console.log("success")
       return {
         authorization: true,
         user: {

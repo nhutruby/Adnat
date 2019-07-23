@@ -8,7 +8,8 @@ import { auth } from "../auth/AuthAction"
 const Home = lazy(() => import("../home/Home"))
 const Welcome = lazy(() => import("../welcome/Welcome"))
 class CApp extends React.Component {
-  componentWillMount() {
+  constructor(props) {
+    super(props)
     sagaMiddleware.run(AuthSaga, this.props.store)
     const authToken = getCookie("auth_token")
     if (authToken !== "") {
@@ -16,8 +17,8 @@ class CApp extends React.Component {
     }
   }
   render() {
-    const { authorization } = this.props
-    return (
+    const { authorization, isLoading } = this.props
+    return !isLoading ? (
       <div>
         <Router>
           <Suspense fallback={<div />}>
@@ -29,13 +30,16 @@ class CApp extends React.Component {
           </Suspense>
         </Router>
       </div>
+    ) : (
+      <div />
     )
   }
 }
 
 const mapStateToProps = state => {
   return {
-    authorization: state.AuthReducer.authorization
+    authorization: state.AuthReducer.authorization,
+    isLoading: state.AuthReducer.isLoading
   }
 }
 const mapDispatchToProps = dispatch => {
