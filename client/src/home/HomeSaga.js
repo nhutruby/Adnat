@@ -156,6 +156,25 @@ function* workerDeleteShift() {
     }
   }
 }
+function editShift(params) {
+  setHeader(params.auth_token)
+  delete params.auth_token
+  return axios.put("/shifts/" + params.id, params)
+}
+
+function* workerEditShift() {
+  while (true) {
+    try {
+      const request = yield take("EDIT_SHIFT")
+      const params = request.payload
+      const response = yield call(editShift, params)
+      const data = response.data
+      yield put({ type: "EDIT_SHIFT_SUCCESS", data })
+    } catch (error) {
+      yield put({ type: "EDIT_SHIFT_FAIL", error })
+    }
+  }
+}
 export default function* watcherSearch() {
   yield fork(workerHome)
   yield fork(workerDeleteOrganisation)
@@ -165,4 +184,5 @@ export default function* watcherSearch() {
   yield fork(workerLeaveOrganisation)
   yield fork(workerNewShift)
   yield fork(workerDeleteShift)
+  yield fork(workerEditShift)
 }

@@ -12,11 +12,7 @@ import Button from "@material-ui/core/Button"
 import Tooltip from "@material-ui/core/Tooltip"
 import DeleteIcon from "@material-ui/icons/Delete"
 import EditIcon from "@material-ui/icons/Edit"
-import {
-  deleteShift,
-  newShiftShow,
-  editOrganisationShow
-} from "../home/HomeAction"
+import { deleteShift, newShiftShow, editShiftShow } from "../home/HomeAction"
 import { connect } from "react-redux"
 import getCookie from "../common/cookie"
 import Dialog from "@material-ui/core/Dialog"
@@ -54,9 +50,10 @@ class FormDialog extends React.Component {
 
   render() {
     const {
-      organisationId,
-      name,
-      hourlyRate,
+      shiftId,
+      startTime,
+      endTime,
+      breakLength,
       dialogShow,
       maxWidth,
       rowsPerPage
@@ -75,9 +72,11 @@ class FormDialog extends React.Component {
         form = (
           <Edit
             handlerFromFormDialog={this.handleData}
-            id={organisationId}
-            name={name}
-            hourlyRate={hourlyRate}
+            id={shiftId}
+            startTime={startTime}
+            endTime={endTime}
+            breakLength={breakLength}
+            rowsPerPage={rowsPerPage}
           />
         )
         break
@@ -104,9 +103,10 @@ function FList(props) {
   const [open, setOpen] = React.useState(false)
   const [dialogShow, setDialogShow] = React.useState()
   const [maxWidth, setMaxWidth] = React.useState()
-  const [name, setName] = React.useState()
-  const [hourlyRate, setHourlyRate] = React.useState()
-  const [organisationId, setOrganisationId] = React.useState()
+  const [startTime, setStartTime] = React.useState()
+  const [endTime, setEndTime] = React.useState()
+  const [shiftId, setShiftId] = React.useState()
+  const [breakLength, setBreakLength] = React.useState()
   const [rowsPerPage] = React.useState(20)
   const handleDeleteClick = (event, id) => {
     event.stopPropagation()
@@ -128,21 +128,23 @@ function FList(props) {
     setMaxWidth(maxWidth)
     props.newShiftShow()
   }
-  const handleEditOrganisation = (
+  const handleEditShift = (
     event,
-    organisationId,
-    name,
-    hourlyRate,
+    shiftId,
+    startTime,
+    endTime,
+    breakLength,
     maxWidth
   ) => {
     event.stopPropagation()
     setOpen(true)
     setDialogShow("edit")
-    setOrganisationId(organisationId)
-    setName(name)
-    setHourlyRate(hourlyRate)
+    setShiftId(shiftId)
+    setStartTime(startTime)
+    setEndTime(endTime)
+    setBreakLength(breakLength)
     setMaxWidth(maxWidth)
-    props.editOrganisationShow("list")
+    props.editShiftShow()
   }
   return (
     <div>
@@ -191,18 +193,19 @@ function FList(props) {
                       {format(new Date(row.end_time), "h:mm:a")}
                     </TableCell>
                     <TableCell align="right">{row.break_length}</TableCell>
-                    <TableCell align="right" />
-                    <TableCell align="right" />
+                    <TableCell align="right">{row.hours_worked}</TableCell>
+                    <TableCell align="right"> {row.shift_cost}</TableCell>
                     <TableCell align="right">
                       <Tooltip title="Edit">
                         <EditIcon
                           className={classes.icon}
                           onClick={event =>
-                            handleEditOrganisation(
+                            handleEditShift(
                               event,
                               row.id,
-                              row.name,
-                              row.hourly_rate,
+                              row.start_time,
+                              row.end_time,
+                              row.break_length,
                               "sm"
                             )
                           }
@@ -230,9 +233,10 @@ function FList(props) {
         dialogShow={dialogShow}
         maxWidth={maxWidth}
         rowsPerPage={rowsPerPage}
-        name={name}
-        hourlyRate={hourlyRate}
-        organisationId={organisationId}
+        startTime={startTime}
+        endTime={endTime}
+        breakLength={breakLength}
+        shiftId={shiftId}
       />
     </div>
   )
@@ -242,6 +246,39 @@ FList.propTypes = {
   classes: PropTypes.object.isRequired
 }
 const mapStateToProps = state => {
+  let shifts = state.HomeReducer.shifts
+  console.log(shifts)
+  const organisation = state.HomeReducer.user_organisation
+  shifts &&
+    shifts.forEach(i => {
+      const startTime = new Date(i.start_time)
+      const endTime = new Date(i.end_time)
+      const startHours = startTime.getHours()
+      const startMinutes = startTime.getMinutes()
+      const endHours = endTime.getHours()
+      const endMinutes = endTime.getMinutes()
+      if (startHours * 60 + startMinutes <= endHours * 60 + endMinutes) {
+        const shiftLength =
+          endHours * 60 + endMinutes - startHours * 60 - startMinutes
+        console.log(shiftLength)
+        const hoursWorked = ((shiftLength - i.break_length) / 60).toFixed(2)
+        console.log(hoursWorked)
+        let shiftCost = organisation
+          ? (hoursWorked * organisation.hourly_rate).toFixed(2)
+          : 0
+        console.log(".........")
+        console.log(startTime.getDay())
+        i.hours_worked = hoursWorked
+        if (startTime.getDay() === 0) {
+          console.log("aasunday")
+          shiftCost = organisation
+            ? (hoursWorked * organisation.hourly_rate * 2).toFixed(2)
+            : 0
+        }
+        console.log(shiftCost)
+        i.shift_cost = shiftCost
+      }
+    })
   return {
     user_organisation: state.HomeReducer.user_organisation,
     shifts: state.HomeReducer.shifts
@@ -251,7 +288,7 @@ const mapDispatchToProps = dispatch => {
   return {
     deleteShift: params => dispatch(deleteShift(params)),
     newShiftShow: () => dispatch(newShiftShow()),
-    editOrganisationShow: kind => dispatch(editOrganisationShow(kind))
+    editShiftShow: () => dispatch(editShiftShow())
   }
 }
 const List = connect(

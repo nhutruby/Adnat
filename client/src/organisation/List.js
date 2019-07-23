@@ -78,6 +78,7 @@ class FormDialog extends React.Component {
             id={organisationId}
             name={name}
             hourlyRate={hourlyRate}
+            rowsPerPage={rowsPerPage}
           />
         )
         break
@@ -173,18 +174,18 @@ function FList(props) {
           </Button>
         </Grid>
       </Paper>
-      <Paper className={classes.root}>
-        <Table className={classes.table}>
-          <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell align="right">Hourly Rate</TableCell>
-              <TableCell align="right">Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {props.organisations &&
-              props.organisations.map(row => (
+      {props.organisations && props.organisations.length > 0 ? (
+        <Paper className={classes.root}>
+          <Table className={classes.table}>
+            <TableHead>
+              <TableRow>
+                <TableCell>Name</TableCell>
+                <TableCell align="right">Hourly Rate</TableCell>
+                <TableCell align="right">Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {props.organisations.map(row => (
                 <TableRow key={row.id}>
                   <TableCell component="th" scope="row">
                     {row.name}
@@ -220,9 +221,13 @@ function FList(props) {
                   </TableCell>
                 </TableRow>
               ))}
-          </TableBody>
-        </Table>
-      </Paper>
+            </TableBody>
+          </Table>
+        </Paper>
+      ) : (
+        <div> No Data </div>
+      )}
+
       <FormDialog
         open={open}
         handlerFromParent={handleData}

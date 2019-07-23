@@ -69,16 +69,51 @@ class CNew extends React.Component {
     this.setState({ selectedStartTime: data })
     if (data && data.toString() === "Invalid Date") {
       this.setState({ startTimeError: "Start Time is not valid" })
+      return
     }
+    const startYear = data.getFullYear()
+    const startMonth = data.getMonth()
+    const startDate = data.getDate()
+    const startHours = data.getHours()
+    const startMinutes = data.getMinutes()
+    let startTime = new Date(
+      startYear,
+      startMonth,
+      startDate,
+      startHours,
+      startMinutes
+    )
+    this.setState({ selectedStartTime: startTime })
   }
   handleEndTimeChange = data => {
     this.setState({ endTimeError: null })
     if (data === null) {
       data = new Date()
     }
-    this.setState({ selectedEndTime: new Date(data) })
     if (data && data.toString() === "Invalid Date") {
       this.setState({ endTimeError: "End Time is not valid" })
+      return
+    }
+    const { selectedStartTime } = this.state
+    const startYear = selectedStartTime.getFullYear()
+    const startMonth = selectedStartTime.getMonth()
+    const startDate = selectedStartTime.getDate()
+    const startHours = selectedStartTime.getHours()
+    const startMinutes = selectedStartTime.getMinutes()
+    const endHours = data.getHours()
+    const endMinutes = data.getMinutes()
+    let endTime = new Date(
+      startYear,
+      startMonth,
+      startDate,
+      endHours,
+      endMinutes
+    )
+    if (endHours * 60 + endMinutes < startHours * 60 + startMinutes) {
+      endTime.setDate(endTime.getDate() + 1)
+      this.setState({ selectedEndTime: endTime })
+    } else {
+      this.setState({ selectedEndTime: endTime })
     }
   }
   handleValidate = () => {

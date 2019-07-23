@@ -87,7 +87,6 @@ const HomeReducer = (state, action) => {
           break
         default:
       }
-
       return { ...state, error: false }
     case "JOIN_ORGANISATION":
       return { ...state, error: null }
@@ -141,6 +140,22 @@ const HomeReducer = (state, action) => {
       } else {
         return { ...state }
       }
+    case "EDIT_SHIFT_SHOW":
+      return { ...state, error: null }
+    case "EDIT_SHIFT":
+      return state
+    case "EDIT_SHIFT_FAIL":
+      return { ...state, error: action.error.response.data }
+    case "EDIT_SHIFT_SUCCESS":
+      state.shifts &&
+        state.shifts.forEach(function(i) {
+          if (i.id === action.data.id) {
+            i.start_time = action.data.start_time
+            i.end_time = action.data.end_time
+            i.break_length = action.data.break_length
+          }
+        })
+      return { ...state, error: false }
     default:
       return state
   }

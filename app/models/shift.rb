@@ -13,4 +13,15 @@ class Shift
   # Associations
   belongs_to :user
   belongs_to :organisation
+
+=begin
+  before_save :set_utc_time
+
+  private
+
+  def set_utc_time
+    self.start_time = Time.parse(self.start_time).getutc
+    self.end_time = Time.parse(self.end_time).getutc
+  end
+=end
 end

@@ -79,3 +79,15 @@ export const deleteShiftSuccess = () => {
 export const deleteShiftFail = error => {
   return { type: "DELETE_SHIFT_FAIL", error: error }
 }
+export const editShiftShow = () => {
+  return { type: "EDIT_SHIFT_SHOW" }
+}
+export const editShift = params => {
+  return { type: "EDIT_SHIFT", payload: params }
+}
+export const editShiftSuccess = () => {
+  return { type: "EDIT_SHIFT_SUCCESS" }
+}
+export const editShiftFail = error => {
+  return { type: "EDIT_SHIFT_FAIL", error: error }
+}

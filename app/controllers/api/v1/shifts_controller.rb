@@ -38,9 +38,9 @@ module Api
       # PATCH/PUT /shifts/1
       def update
         if @shift.update(shift_params)
-          render json: @shift
+          render json: @shift.to_json(only: %I[_id start_time end_time break_length])
         else
-          render json: @shift.errors, status: :unprocessable_entity
+          render json: @shift.errors.full_messages, status: :unprocessable_entity
         end
       end
 
