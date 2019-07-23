@@ -4,29 +4,20 @@ const HomeReducer = (state, action) => {
     return {
       organisations: [],
       shifts: [],
-      user_organisation: null,
-      isLoading: false
+      user_organisation: null
     }
 
   switch (action.type) {
     case "HOME":
-      console.log("start home")
-      let isLoading = true
-      if (state.organisations && state.organisations.length > 0) {
-        isLoading = false
-      }
       return {
-        ...state,
-        isLoading: isLoading
+        ...state
       }
     case "HOME_FAIL":
-      console.log("fail home")
       return {
         ...state,
         error: action.message
       }
     case "HOME_SUCCESS":
-      console.log("success home")
       let organisations
       action.data.organisations
         ? (organisations = _.uniqBy(
@@ -43,8 +34,7 @@ const HomeReducer = (state, action) => {
         ...state,
         organisations: organisations,
         user_organisation: action.data.organisation,
-        shifts: shifts,
-        isLoading: false
+        shifts: shifts
       }
 
     case "DELETE_ORGANISATION":

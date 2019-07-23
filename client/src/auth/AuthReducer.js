@@ -4,15 +4,13 @@ const AuthReducer = (state, action) => {
       user: {
         name: ""
       },
-      authorization: false,
-      isLoading: false
+      authorization: false
     }
 
   switch (action.type) {
     case "AUTH":
       return {
-        ...state,
-        isLoading: true
+        ...state
       }
     case "AUTH_FAIL":
       return {
@@ -26,8 +24,7 @@ const AuthReducer = (state, action) => {
         user: {
           auth_token: action.user.auth_token,
           name: action.user.name
-        },
-        isLoading: false
+        }
       }
     default:
       return state
