@@ -64,7 +64,7 @@ class CHome extends React.Component {
   }
   render() {
     const { classes, user_organisation, isLoading } = this.props
-    return !isLoading ? (
+    return !isLoading || !user_organisation ? (
       <div className={classes.root}>
         {user_organisation != null ? (
           <Grid container={true} spacing={0}>
