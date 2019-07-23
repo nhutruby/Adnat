@@ -63,8 +63,8 @@ class CHome extends React.Component {
     window.removeEventListener("scroll", this.handleScroll)
   }
   render() {
-    const { classes, user_organisation } = this.props
-    return (
+    const { classes, user_organisation, isLoading } = this.props
+    return !isLoading ? (
       <div className={classes.root}>
         {user_organisation != null ? (
           <Grid container={true} spacing={0}>
@@ -111,7 +111,7 @@ class CHome extends React.Component {
           </Grid>
         )}
       </div>
-    )
+    ) : null
   }
 }
 CHome.propTypes = {
@@ -121,7 +121,8 @@ const mapStateToProps = state => {
   return {
     organisations: state.HomeReducer.organisations,
     user_organisation: state.HomeReducer.user_organisation,
-    shifts: state.HomeReducer.shifts
+    shifts: state.HomeReducer.shifts,
+    isLoading: state.AuthReducer.isLoading
   }
 }
 const mapDispatchToProps = dispatch => {
