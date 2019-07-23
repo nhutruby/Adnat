@@ -1,22 +1,23 @@
-import React, {Suspense, lazy} from 'react'
-import {connect} from 'react-redux'
-import {BrowserRouter as Router} from 'react-router-dom'
-import getCookie from '../common/cookie'
-import sagaMiddleware from '../common/saga'
-import AuthSaga from '../auth/AuthSaga'
-import {auth} from '../auth/AuthAction'
-const Home = lazy(() => import('../home/Home'))
-const Welcome = lazy(() => import('../welcome/Welcome'))
+import React, { Suspense, lazy } from "react"
+import { connect } from "react-redux"
+import { BrowserRouter as Router } from "react-router-dom"
+import getCookie from "../common/cookie"
+import sagaMiddleware from "../common/saga"
+import AuthSaga from "../auth/AuthSaga"
+import { auth } from "../auth/AuthAction"
+const Home = lazy(() => import("../home/Home"))
+const Welcome = lazy(() => import("../welcome/Welcome"))
 class CApp extends React.Component {
-  componentWillMount() {
+  constructor(props) {
+    super(props)
     sagaMiddleware.run(AuthSaga, this.props.store)
-    const authToken = getCookie('auth_token')
-    if (authToken !== '') {
+    const authToken = getCookie("auth_token")
+    if (authToken !== "") {
       this.props.auth(authToken)
     }
   }
   render() {
-    const {authorization} = this.props
+    const { authorization } = this.props
     return (
       <div>
         <Router>
@@ -34,7 +35,7 @@ class CApp extends React.Component {
 }
 
 const mapStateToProps = state => {
-  return {authorization: state.AuthReducer.authorization}
+  return { authorization: state.AuthReducer.authorization }
 }
 const mapDispatchToProps = dispatch => {
   return {
