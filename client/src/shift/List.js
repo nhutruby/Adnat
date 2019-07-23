@@ -247,7 +247,6 @@ FList.propTypes = {
 }
 const mapStateToProps = state => {
   let shifts = state.HomeReducer.shifts
-  console.log(shifts)
   const organisation = state.HomeReducer.user_organisation
   shifts &&
     shifts.forEach(i => {
@@ -257,25 +256,75 @@ const mapStateToProps = state => {
       const startMinutes = startTime.getMinutes()
       const endHours = endTime.getHours()
       const endMinutes = endTime.getMinutes()
-      if (startHours * 60 + startMinutes <= endHours * 60 + endMinutes) {
-        const shiftLength =
-          endHours * 60 + endMinutes - startHours * 60 - startMinutes
-        console.log(shiftLength)
+      const atStart = startHours * 60 + startMinutes
+      const atEnd = endHours * 60 + endMinutes
+      if (atStart <= atEnd) {
+        const shiftLength = atEnd - atStart
         const hoursWorked = ((shiftLength - i.break_length) / 60).toFixed(2)
-        console.log(hoursWorked)
         let shiftCost = organisation
           ? (hoursWorked * organisation.hourly_rate).toFixed(2)
           : 0
-        console.log(".........")
-        console.log(startTime.getDay())
         i.hours_worked = hoursWorked
         if (startTime.getDay() === 0) {
-          console.log("aasunday")
           shiftCost = organisation
             ? (hoursWorked * organisation.hourly_rate * 2).toFixed(2)
             : 0
         }
-        console.log(shiftCost)
+        i.shift_cost = shiftCost
+      } else {
+        const startPeriod = 24 * 60 - atStart
+        const endPeriod = atEnd
+        const shiftLength = startPeriod + endPeriod
+        const hoursWorked = ((shiftLength - i.break_length) / 60).toFixed(2)
+        let shiftCost
+        i.hours_worked = hoursWorked
+        switch (startTime.getDay()) {
+          case 0:
+            if (endPeriod >= i.break_length) {
+              shiftCost = organisation
+                ? (
+                    ((endPeriod - i.break_length) * organisation.hourly_rate +
+                      startPeriod * organisation.hourly_rate * 2) /
+                    60
+                  ).toFixed(2)
+                : 0
+            } else {
+              shiftCost = organisation
+                ? (
+                    ((startPeriod - (i.break_length - endPeriod)) *
+                      organisation.hourly_rate *
+                      2) /
+                    60
+                  ).toFixed(2)
+                : 0
+            }
+            break
+          case 6:
+            if (endPeriod >= i.break_length) {
+              shiftCost = organisation
+                ? (
+                    ((endPeriod - i.break_length) *
+                      organisation.hourly_rate *
+                      2 +
+                      startPeriod * organisation.hourly_rate) /
+                    60
+                  ).toFixed(2)
+                : 0
+            } else {
+              shiftCost = organisation
+                ? (
+                    ((startPeriod - (i.break_length - endPeriod)) *
+                      organisation.hourly_rate) /
+                    60
+                  ).toFixed(2)
+                : 0
+            }
+            break
+          default:
+            shiftCost = organisation
+              ? (hoursWorked * organisation.hourly_rate).toFixed(2)
+              : 0
+        }
         i.shift_cost = shiftCost
       }
     })
