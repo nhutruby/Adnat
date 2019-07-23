@@ -122,7 +122,7 @@ const mapStateToProps = state => {
     organisations: state.HomeReducer.organisations,
     user_organisation: state.HomeReducer.user_organisation,
     shifts: state.HomeReducer.shifts,
-    isLoading: state.AuthReducer.isLoading
+    isLoading: state.HomeReducer.isLoading
   }
 }
 const mapDispatchToProps = dispatch => {

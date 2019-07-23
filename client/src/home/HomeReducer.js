@@ -1,19 +1,28 @@
 import _ from "lodash"
 const HomeReducer = (state, action) => {
   if (state === undefined)
-    return { organisations: [], shifts: [], user_organisation: null }
+    return {
+      organisations: [],
+      shifts: [],
+      user_organisation: null,
+      isLoading: false
+    }
 
   switch (action.type) {
     case "HOME":
+      console.log("start home")
       return {
-        ...state
+        ...state,
+        isLoading: true
       }
     case "HOME_FAIL":
+      console.log("fail home")
       return {
         ...state,
         error: action.message
       }
     case "HOME_SUCCESS":
+      console.log("success home")
       let organisations
       action.data.organisations
         ? (organisations = _.uniqBy(
@@ -30,7 +39,8 @@ const HomeReducer = (state, action) => {
         ...state,
         organisations: organisations,
         user_organisation: action.data.organisation,
-        shifts: shifts
+        shifts: shifts,
+        isLoading: false
       }
 
     case "DELETE_ORGANISATION":
