@@ -17,8 +17,8 @@ class CApp extends React.Component {
     }
   }
   render() {
-    const { authorization } = this.props
-    return (
+    const { authorization, isLoading } = this.props
+    return !isLoading ? (
       <div>
         <Router>
           <Suspense fallback={<div />}>
@@ -30,13 +30,14 @@ class CApp extends React.Component {
           </Suspense>
         </Router>
       </div>
-    )
+    ) : null
   }
 }
 
 const mapStateToProps = state => {
   return {
-    authorization: state.AuthReducer.authorization
+    authorization: state.AuthReducer.authorization,
+    isLoading: state.AuthReducer.isLoading
   }
 }
 const mapDispatchToProps = dispatch => {

@@ -4,13 +4,21 @@ const HomeReducer = (state, action) => {
     return {
       organisations: [],
       shifts: [],
-      user_organisation: null
+      user_organisation: null,
+      isLoading: false
     }
 
   switch (action.type) {
     case "HOME":
+      console.log(action.payload)
+      let isLoading
+      action.payload.isLoading === false
+        ? (isLoading = false)
+        : (isLoading = true)
+
       return {
-        ...state
+        ...state,
+        isLoading: isLoading
       }
     case "HOME_FAIL":
       return {
@@ -34,7 +42,8 @@ const HomeReducer = (state, action) => {
         ...state,
         organisations: organisations,
         user_organisation: action.data.organisation,
-        shifts: shifts
+        shifts: shifts,
+        isLoading: false
       }
 
     case "DELETE_ORGANISATION":
