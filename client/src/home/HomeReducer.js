@@ -10,19 +10,16 @@ const HomeReducer = (state, action) => {
 
   switch (action.type) {
     case "HOME":
-      console.log("start home")
       return {
         ...state,
         isLoading: true
       }
     case "HOME_FAIL":
-      console.log("fail home")
       return {
         ...state,
         error: action.message
       }
     case "HOME_SUCCESS":
-      console.log("success home")
       let organisations
       action.data.organisations
         ? (organisations = _.uniqBy(
