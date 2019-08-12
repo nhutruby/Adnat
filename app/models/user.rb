@@ -65,13 +65,23 @@ class User
 
   def self.home(organisation, params)
     if organisation.present?
-      shifts = Shift.where(organisation_id: organisation.id)
-                    .order_by(id: :desc).page(params[:page]).per(params[:per_page])
-      { organisation: organisation, shifts: shifts }
+      search_shifts(organisation, params)
     else
-      organisations = Organisation.order_by(id: :desc).page(params[:page]).per(params[:per_page])
-      organisations.to_json(only: %I[_id name hourly_rate])
-      { organisations: organisations }
+      search_organisations(params)
     end
+  end
+
+  def self.search_shifts(organisation, params)
+    shifts = Shift.where(organisation_id: organisation.id)
+                  .order_by(id: :desc).page(params[:page]).per(params[:per_page])
+    { organisation: organisation,
+      shifts: shifts.as_json(only: %I[_id start_time end_time break_length],
+                             include: { user: { only: :name } }) }
+  end
+
+  def self.search_organisations(params)
+    organisations = Organisation.order_by(id: :desc).page(params[:page]).per(params[:per_page])
+    organisations.to_json(only: %I[_id name hourly_rate])
+    { organisations: organisations }
   end
 end
