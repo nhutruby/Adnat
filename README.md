@@ -1,5 +1,5 @@
 # Technologies
-React, Redux, Redux-Saga, Rails API, MongoDB, Rspec, Front-Back end structure
+React, Redux, Redux-Saga, Rails API, MongoDB, Rspec, Front-Back end structure.
 You can use the folder(client) be run in a separate server. We shouldn't use MVC of Ruby on Rails framework.
 
 ## On Heroku
