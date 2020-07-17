@@ -11,7 +11,7 @@
     "classnames": "^2.2.6",
     "cookie": "^0.4.0",
     "date-fns": "^2.0.0-beta.2",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "prop-types": "^15.7.2",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
